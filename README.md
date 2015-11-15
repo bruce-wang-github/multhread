@@ -11,40 +11,44 @@ https://github.com/vbvbipny/multhread
 
 /**
  * Created with IntelliJ IDEA.
- * 带获取任务的多线程处理任务封装
- * className: SelectTaskMulThreadService
+ * 测试多线程处理任务
+ * className: TaskMulThreadServiceTest
  *
  * @version 1.0
  *          Date Time: a
  *@author: ddys
  */
-public class SelectTaskMulThreadService<T,V> extends TaskMulThreadService<T,V> {
-    public SelectTaskMulThreadService(ISelectTask<T, V> taskHandle, Integer maxThread) {
-        super(taskHandle, maxThread);
-    }
+public class TaskMulThreadServiceTest extends TestCase implements ITaskHandle<String,Boolean>{
 
-    public SelectTaskMulThreadService(ISelectTask<T, V> taskHandle) {
-        super(taskHandle);
+    public void testExecute() throws Exception {
+        String [] taskItems = new String[100];
+        for (int i=0;i<100;i++){
+            taskItems[i]="任务"+i;
+        }
+        IMulThreadService<String,Boolean> mulThreadService = new TaskMulThreadService(this);
+        long start = System.currentTimeMillis();
+        List<Boolean> result = mulThreadService.execute(taskItems);
+        for (Boolean e : result){
+            if(!e){
+                System.out.println("任务处理失败");
+            }
+        }
+        System.out.println("所有任务处理完成，耗时"+(System.currentTimeMillis()-start)+",任务成功数"+result.size());
     }
 
     /**
-     * @param '' 传递参数
-     * @return a返回类型
-     * @throws
-     * @Title: a
-    * @Description: 执行任务，返回所有任务的结果集合
-     * @author ddys
-     * @date 2015-11-15 21:06
+     * Created with IntelliJ IDEA.
+     * 执行任务，返回所有执行的结果
+     * className: TaskMulThreadService
+     *
+     * @author: ddys
+     * @version 1.0
+     * Date Time:
      */
-    public List<V> execute(T... task) {
-        if(this.taskHandle instanceof ISelectTask){
-            task = ((ISelectTask<T,V>) this.taskHandle).getTaskItem();
-        }else{
-            throw new RuntimeException("SelectTaskMulThreadService 必须使用 ISelectTask的实现");
-        }
-        return super.execute(task);
+    public Boolean execute(String s) {
+        System.out.println(Thread.currentThread().getId()+"线程正在处理"+s);
+        return true;
     }
-
 }
 ```
 2.附带一个查询任务的方法，实现这个查询任务方法和业务处理方法，然后执行返回处理结果
